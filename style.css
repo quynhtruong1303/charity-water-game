@@ -430,48 +430,51 @@ body {
   50%       { transform: translateY(-5px); }
 }
 
-/* ---------- Cleanliness Strip (white bg per wireframe) ---------- */
+/* ---------- Cleanliness Strip ---------- */
 .cleanliness-strip {
   display: flex;
+  flex-wrap: wrap;          /* stacks vertically on narrow screens */
   align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
+  gap: 6px 12px;
+  padding: 14px 14px;
   background-color: #fff;
   border-top: 2.5px solid #1A1A1A;
 }
 
-.strip-icon {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
-  flex-shrink: 0;
-}
-
-.cleanliness-right {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
 .cleanliness-label {
-  font-size: 10px;
+  font-size: 16px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   color: #1A1A1A;
   opacity: 0.6;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Cans + percentage sit together, expand to fill remaining space */
+.cleanliness-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
 }
 
 .jerry-can-row {
+  flex: 1;
   display: flex;
-  gap: 3px;
   align-items: center;
+  gap: 2px;
+  min-width: 0;
 }
 
+/* Each can grows to fill the row equally */
 .jerry-can {
-  width: 20px;
-  height: 20px;
+  flex: 1;
+  max-width: 40px;
+  height: auto;
+  aspect-ratio: 1;
   object-fit: contain;
   transition: opacity 0.3s;
 }
@@ -481,9 +484,11 @@ body {
 }
 
 .cleanliness-pct {
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 800;
   color: #1A1A1A;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 /* =====================================================
