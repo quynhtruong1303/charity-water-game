@@ -56,13 +56,15 @@
           <div class="otto-game-sprite">
             <img src="img/otter_v1.png" id="otto-sprite" alt="Otto">
           </div>
-          <div class="stat-row">
-            <img src="img/pill.png" class="stat-icon" alt="medicine">
-            <span class="stat-count" id="medicine-count">0</span>
-          </div>
-          <div class="stat-row">
-            <img src="img/can.png" class="stat-icon" alt="trash collected">
-            <span class="stat-count" id="trash-collected">0</span>
+          <div class="stats-group">
+            <div class="stat-row">
+              <img src="img/pill.png" class="stat-icon" alt="medicine">
+              <span class="stat-count" id="medicine-count">0</span>
+            </div>
+            <div class="stat-row">
+              <img src="img/can.png" class="stat-icon" alt="trash collected">
+              <span class="stat-count" id="trash-collected">0</span>
+            </div>
           </div>
         </div>
 
@@ -92,12 +94,12 @@
 
       <!-- Bottom: Water Cleanliness jerry-can bar (white bg per wireframe) -->
       <div class="cleanliness-strip">
-        <span class="cleanliness-label">Water Cleanliness</span>
-        <div class="cleanliness-bar">
-          <div class="jerry-can-row" id="jerry-can-row">
-            <!-- 10 cans rendered by JS -->
-          </div>
+        <div class="cleanliness-header">
+          <span class="cleanliness-label">Water Cleanliness</span>
           <span class="cleanliness-pct" id="cleanliness-pct">80%</span>
+        </div>
+        <div class="jerry-can-row" id="jerry-can-row">
+          <!-- 10 cans rendered by JS -->
         </div>
       </div>
 
