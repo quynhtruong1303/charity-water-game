@@ -1,143 +1,540 @@
-/* Charity: water Brand Colors & Fonts
+/* =====================================================
+   charity:water – Otterly Clean! Game Styles
 
-Primary Colors:
-- Yellow:     #FFC907
-- Blue:       #2E9DF7
+   Official Brand Palette (Pantone / brand guide):
+     Yellow      #FFC907  — primary, Jerry Can yellow
+     Navy        #003366  — dark accent
+     Steel Blue  #77A8BB  — secondary blue
+     Cream       #FFF7E1  — soft background tint
+     Black       #1A1A1A  — Pantone Black 6 U, body text & buttons
+     Peach       #FED8C1  — warm secondary
+     Rust        #BF6C46  — warm accent / dirty-water indicator
+     Gray        #CBCCD1  — neutral / UI strokes
 
-Secondary Colors:
-- Light Blue: #8BD1CB
-- Green:      #4FCB53
-- Orange:     #FF902A
-- Red:        #F5402C
-- Dark Green: #159A48
-- Pink:       #F16061
+   Fonts (brand): Proxima Nova, Avenir
+   ===================================================== */
 
-Fonts:
-- Proxima Nova
-- Avenir
-
-*/
-
-* {
+/* ---------- Reset & Base ---------- */
+*, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 30px;
-  background-color: #f0f0f0;
-  color: #333;
-}
-
-.container {
-  max-width: 750px;
-  margin: 50px auto;
-  background-color: #fff;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-
-h1 {
-  text-align: center;
-  font-size: 30px;
-  font-weight: bold;
-  margin-bottom: 20px;
-  color: #333;
-}
-
-h1 img {
-  height: 50px;
-  margin-right: 15px;
-  display: block;
-}
-
-.game-instructions {
-  font-size: 18px;
-  margin-bottom: 30px;
-  text-align: center;
-}
-
-.stats {
-  display: flex;
-  justify-content: space-around;
-  margin-bottom: 30px;
-  background-color: #f5f5f5;
-  padding: 15px 0;
-  border-radius: 8px;
-}
-
-.stats p {
-  margin: 0;
-  font-size: 18px;
-  font-weight: bold;
-  color: #333;
-}
-
-.game-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin: 0 auto;
-  max-width: 500px;
-}
-
-.grid-cell {
-  background-color: #e8e8e8;
-  border-radius: 8px;
-  aspect-ratio: 1;
+  font-family: 'Avenir', 'Proxima Nova', Arial, sans-serif;
+  background-color: #fff7e1;
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: background-color 0.3s;
-  position: relative;
-  overflow: hidden;
 }
 
-.water-can-wrapper {
+/* ---------- Screen management ---------- */
+.screen {
+  display: none;
+  width: 100%;
+}
+
+.screen.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 24px 16px;
+}
+
+/* ---------- Start Screen Card ---------- */
+.start-card {
+  background-color: #ffc907;
+  border: 2.5px solid #1A1A1A;
+  border-radius: 28px;
+  padding: 32px 28px 24px;
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* ---------- charity:water Logo ---------- */
+.cw-logo-wrap {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 6px 12px;
+  margin-bottom: 20px;
+}
+
+.cw-logo {
+  height: 22px;
+  display: block;
+}
+
+/* ---------- Title & Subtitle ---------- */
+.game-title {
+  font-size: 38px;
+  font-weight: 900;
+  color: #1A1A1A;
+  text-align: center;
+  line-height: 1.1;
+  margin-bottom: 6px;
+}
+
+.game-subtitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: #1A1A1A;
+  text-align: center;
+  margin-bottom: 28px;
+  opacity: 0.75;
+}
+
+/* ---------- Otter Hero Image ---------- */
+.otter-hero {
+  width: 140px;
+  height: 140px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.otter-hero img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  /* subtle bounce animation to bring Otto to life */
+  animation: otterFloat 3s ease-in-out infinite;
+}
+
+@keyframes otterFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
+/* ---------- Start Button ---------- */
+.btn-primary {
+  background-color: #1A1A1A;
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  padding: 16px 0;
+  width: 100%;
+  font-size: 17px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform 0.15s ease, background-color 0.2s ease;
+  margin-bottom: 14px;
+  letter-spacing: 0.3px;
+}
+
+.btn-primary:hover {
+  background-color: #003366;
+  transform: scale(1.04);
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+/* ---------- Reward hint ---------- */
+.reward-hint {
+  font-size: 11px;
+  color: #1A1A1A;
+  opacity: 0.55;
+  text-align: center;
+}
+
+/* =====================================================
+   GAME SCREEN
+   ===================================================== */
+
+/* ---------- Game Card ---------- */
+.game-card {
+  background-color: #ffc907;
+  border: 2.5px solid #1A1A1A;
+  border-radius: 28px;
+  width: 100%;
+  max-width: 760px;
+  height: calc(100vh - 48px);
+  max-height: 780px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;          /* keep children inside rounded corners */
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
+}
+
+/* ---------- Top Bar ---------- */
+.game-top-bar {
+  display: flex;
+  align-items: stretch;
+  border-bottom: 2px solid #1A1A1A;
+}
+
+.timer-box,
+.weather-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  gap: 2px;
+}
+
+.timer-box {
+  border-right: 2px solid #1A1A1A;
+  min-width: 100px;
+}
+
+.weather-box {
+  flex: 1;
+}
+
+.top-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #1A1A1A;
+  opacity: 0.65;
+}
+
+.timer-value {
+  font-size: 22px;
+  font-weight: 900;
+  color: #1A1A1A;
+  line-height: 1;
+}
+
+.weather-icon {
+  font-size: 22px;
+  line-height: 1;
+}
+
+/* ---------- Game Body ---------- */
+.game-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;   /* let flexbox shrink/grow to fill available height */
+}
+
+/* ---------- Left Panel ---------- */
+.game-left-panel {
+  width: 130px;
+  flex-shrink: 0;
+  border-right: 2px solid #1A1A1A;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 8px 12px;
+  gap: 8px;
+  position: relative;
+}
+
+/* Speech bubble with tail pointing right */
+.speech-bubble {
+  background: #fff;
+  border: 1.5px solid #1A1A1A;
+  border-radius: 12px;
+  padding: 6px 9px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-align: center;
+  position: relative;
+  width: 100%;
+}
+
+.speech-bubble::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  border: 5px solid transparent;
+  border-top-color: #fff;
+  filter: drop-shadow(0 1.5px 0 #1A1A1A);
+}
+
+.otto-game-sprite {
+  width: 72px;
+  height: 72px;
+  margin-top: 8px;
+}
+
+.otto-game-sprite img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+/* Medicine & Trash badge counters */
+.stat-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: 20px;
+}
+
+.medicine-badge {
+  background-color: #F5402C;
+}
+
+.trash-badge {
+  background-color: #4FCB53;
+}
+
+.badge-label {
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  line-height: 1.1;
+}
+
+.badge-count {
+  font-size: 15px;
+  font-weight: 900;
+  color: #fff;
+}
+
+.badge-sublabel {
+  font-size: 8px;
+  color: #fff;
+  opacity: 0.85;
+  margin-top: 1px;
+}
+
+/* ---------- Play Area ---------- */
+.game-play-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Air zone — where rain droplets fall */
+.air-zone {
+  flex: 3;
+  border-bottom: 2px solid #1A1A1A;
+  position: relative;
+  overflow: hidden;
+  background-color: #ffc907;   /* sunny = same yellow; JS swaps for rain */
+}
+
+/* Pool zone — the water */
+.pool-zone {
+  flex: 2;
+  position: relative;
+  overflow: hidden;
+  background-color: #2E9DF7;   /* bright blue = clean water */
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-start;
+}
+
+.pool-label {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 70px;
-  height: 70px;
-  /* Ensure the wrapper is properly centered */
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(255,255,255,0.5);
+  pointer-events: none;
+  white-space: nowrap;
 }
 
-.water-can {
+/* Floating trash items */
+.trash-item {
+  position: absolute;
+  width: 128px;
+  height: 128px;
+  object-fit: contain;
+  cursor: pointer;
+  animation: trashBob 2.5s ease-in-out infinite;
+}
+
+.trash-item:nth-child(2) { animation-delay: 0.6s; }
+.trash-item:nth-child(3) { animation-delay: 1.2s; }
+
+@keyframes trashBob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+
+/* ---------- Cleanliness Strip (white bg per wireframe) ---------- */
+.cleanliness-strip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background-color: #fff;
+  border-top: 2px solid #1A1A1A;
+}
+
+.strip-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.cleanliness-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cleanliness-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #1A1A1A;
+  opacity: 0.6;
+}
+
+.jerry-can-row {
+  display: flex;
+  gap: 3px;
+  align-items: center;
+}
+
+.jerry-can {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  transition: opacity 0.3s;
+}
+
+.jerry-can.empty {
+  opacity: 0.2;
+}
+
+.cleanliness-pct {
+  font-size: 11px;
+  font-weight: 800;
+  color: #1A1A1A;
+}
+
+/* =====================================================
+   SCORE SCREEN
+   ===================================================== */
+
+/* ---------- Score Card ---------- */
+.score-card {
+  background-color: #ffc907;
+  border: 2.5px solid #1A1A1A;
+  border-radius: 28px;
+  padding: 32px 28px 28px;
   width: 100%;
-  height: 100%;
-  background-image: url('img/water-can.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  cursor: pointer;
-  border-radius: 50%;
-  animation: popUp 0.5s cubic-bezier(0.17, 0.67, 0.34, 2);
-  transform-origin: center; /* Ensure scaling happens from the center */
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18);
 }
 
-@keyframes popUp {
-  0% {
-    transform: scale(0.5); /* Start scaling from the center */
-  }
-  100% {
-    transform: scale(1); /* End scaling at full size */
-  }
+/* ---------- Score Title ---------- */
+.score-title {
+  font-size: 26px;
+  font-weight: 900;
+  color: #1A1A1A;
+  text-align: center;
+  margin-bottom: 16px;
 }
 
+/* ---------- Otto status line ---------- */
+.otto-status {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1A1A1A;
+  text-align: center;
+  margin-top: 8px;
+  margin-bottom: 20px;
+}
 
-button {
-  background-color: #4CAF50;
-  color: white;
-  border: none;
-  padding: 12px 24px;
+/* ---------- Score Summary Box ---------- */
+.score-summary {
+  background-color: #fff;
+  border-radius: 16px;
+  padding: 20px 20px 16px;
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.score-summary-heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: #1A1A1A;
+  text-align: center;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+}
+
+/* ---------- Score Rows ---------- */
+.score-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+}
+
+.score-label {
+  font-size: 13px;
+  color: #1A1A1A;
+  opacity: 0.7;
+}
+
+.score-value {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1A1A1A;
+}
+
+.score-value.highlight {
+  color: #003366;
+}
+
+.score-divider {
+  height: 1px;
+  background-color: #CBCCD1;
+  margin: 6px 0;
+}
+
+/* Total row */
+.total-row .score-label,
+.total-row .score-value {
+  font-size: 15px;
+  opacity: 1;
+}
+
+.score-value.total-value {
+  color: #003366;
   font-size: 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  display: block;
-  margin: 30px auto 0;
-  transition: background-color 0.2s;
+}
+
+/* Lifetime row */
+.lifetime-row {
+  background-color: #ffc907;
+  border-radius: 10px;
+  padding: 8px 10px;
+  margin-top: 6px;
+}
+
+.lifetime-row .score-label {
+  font-size: 13px;
+  opacity: 0.85;
+}
+
+.score-value.lifetime-value {
+  font-size: 14px;
+  color: #1A1A1A;
 }

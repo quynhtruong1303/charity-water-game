@@ -1,23 +1,158 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width">
-  <title>Water Quest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Otterly Clean! – A charity:water Game</title>
   <link href="style.css" rel="stylesheet" type="text/css" />
 </head>
 <body>
-  <div class="container">
-    <h1>Water Quest</h1>
-    <p class="game-instructions">Collect 20 items to complete the game!</p>
-    <div class="stats">
-      <p>Cans Collected: <span id="current-cans">0</span></p>
-      <p>Time Left: <span id="timer">30</span>s</p>
+
+  <!-- ===== START SCREEN ===== -->
+  <div id="start-screen" class="screen active">
+    <div class="start-card">
+      <div class="cw-logo-wrap">
+        <img src="img/cw_logo_horizontal.png" alt="charity: water" class="cw-logo">
+      </div>
+
+      <h1 class="game-title">Otterly Clean!</h1>
+      <p class="game-subtitle">Keep Otto's Water Clean</p>
+
+      <div class="otter-hero">
+        <img src="img/otter_ic.png" alt="Otto the sea otter">
+      </div>
+
+      <button id="start-btn" class="btn-primary">Start Shift</button>
+      <p class="reward-hint">Earn points to unlock campus rewards</p>
     </div>
-    <div id="achievements" class="achievement"></div>
-    <div class="game-grid"></div>
-    <button id="start-game">Start Game</button>
   </div>
+
+  <!-- ===== GAME SCREEN ===== -->
+  <div id="game-screen" class="screen">
+    <div class="game-card">
+
+      <!-- Top bar: timer + weather -->
+      <div class="game-top-bar">
+        <div class="timer-box">
+          <span class="top-label">Time Left</span>
+          <span class="timer-value" id="game-timer">05:00</span>
+        </div>
+        <div class="weather-box">
+          <span class="weather-icon">☀️</span>
+          <span class="top-label">Sunny</span>
+        </div>
+      </div>
+
+      <!-- Body: left panel + play area -->
+      <div class="game-body">
+
+        <!-- Left panel: Otto + stats -->
+        <div class="game-left-panel">
+          <div class="speech-bubble">I feel great!</div>
+          <div class="otto-game-sprite">
+            <img src="img/otter_ic.png" alt="Otto">
+          </div>
+          <div class="stat-badge medicine-badge">
+            <span class="badge-label">medic</span>
+            <span class="badge-count" id="medicine-count">0</span>
+          </div>
+          <div class="stat-badge trash-badge">
+            <span class="badge-label">Trash</span>
+            <span class="badge-count" id="trash-collected">0</span>
+            <span class="badge-sublabel">collected</span>
+          </div>
+        </div>
+
+        <!-- Right play area -->
+        <div class="game-play-area">
+
+          <!-- Upper air zone (rain droplets fall here) -->
+          <div class="air-zone" id="air-zone">
+            <!-- Droplets rendered by JS during rain events -->
+          </div>
+
+          <!-- Lower pool zone -->
+          <div class="pool-zone" id="pool-zone">
+            <span class="pool-label">Otto's Pool</span>
+            <!-- Placeholder trash items -->
+            <img src="img/bag.png"    class="trash-item" style="left:18%; top:35%;" alt="trash">
+            <img src="img/bottle.png" class="trash-item" style="left:52%; top:55%;" alt="trash">
+            <img src="img/can.png"    class="trash-item" style="left:72%; top:28%;" alt="trash">
+          </div>
+
+        </div>
+      </div><!-- /.game-body -->
+
+      <!-- Bottom: Water Cleanliness jerry-can bar (white bg per wireframe) -->
+      <div class="cleanliness-strip">
+        <img src="img/water-can.png" class="strip-icon" alt="jerry can">
+        <div class="cleanliness-right">
+          <span class="cleanliness-label">Water Cleanliness</span>
+          <div class="jerry-can-row" id="jerry-can-row">
+            <!-- 10 cans rendered by JS -->
+          </div>
+          <span class="cleanliness-pct" id="cleanliness-pct">80%</span>
+        </div>
+      </div>
+
+    </div><!-- /.game-card -->
+  </div>
+
+  <!-- ===== SCORE SCREEN ===== -->
+  <div id="score-screen" class="screen">
+    <div class="score-card">
+      <div class="cw-logo-wrap">
+        <img src="img/cw_logo_horizontal.png" alt="charity: water" class="cw-logo">
+      </div>
+
+      <h2 class="score-title">Shift Complete!</h2>
+
+      <div class="otter-hero">
+        <img src="img/otter_ic.png" alt="Otto the happy sea otter">
+      </div>
+      <p class="otto-status">Otto is happy &amp; healthy today!</p>
+
+      <div class="score-summary">
+        <h3 class="score-summary-heading">Score Summary</h3>
+
+        <div class="score-row">
+          <span class="score-label">Water Cleanliness</span>
+          <span class="score-value highlight">Clean Water ✓</span>
+        </div>
+        <div class="score-divider"></div>
+
+        <div class="score-row">
+          <span class="score-label">Trash Removed</span>
+          <span class="score-value">32 pieces</span>
+        </div>
+        <div class="score-divider"></div>
+
+        <div class="score-row">
+          <span class="score-label">Water Quality Points</span>
+          <span class="score-value">500 pts</span>
+        </div>
+
+        <div class="score-row">
+          <span class="score-label">Trash Bonus</span>
+          <span class="score-value">+150 pts</span>
+        </div>
+        <div class="score-divider"></div>
+
+        <div class="score-row total-row">
+          <span class="score-label">Session Total</span>
+          <span class="score-value total-value">650 pts</span>
+        </div>
+
+        <div class="score-row lifetime-row">
+          <span class="score-label">Lifetime Points</span>
+          <span class="score-value lifetime-value">1,250 pts</span>
+        </div>
+      </div>
+
+      <button id="replay-btn" class="btn-primary">Start Another Shift</button>
+    </div>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
