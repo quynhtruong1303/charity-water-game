@@ -437,6 +437,28 @@ body {
   opacity: 1;
 }
 
+/* ---------- Trash Indicator (corner icon) ---------- */
+.trash-indicator {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background-color: #BF6C46;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 900;
+  padding: 4px 9px;
+  border-radius: 20px;
+  z-index: 20;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+}
+
+.trash-indicator.visible {
+  opacity: 1;
+}
+
 /* Air zone — where rain droplets fall */
 .air-zone {
   flex: 3;

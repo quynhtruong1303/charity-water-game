@@ -65,7 +65,10 @@ const DIFFICULTIES = {
     trashSpawnMin:    8,      // seconds between spawns (min)
     trashSpawnMax:    15,     // seconds between spawns (max)
     badDropletDmg:    0.5,    // % removed when bad droplet hits pool
+    badDropletRate:   0.6,    // fraction of droplets that are bad (0–1)
     dropletInterval:  700,    // ms between droplet spawns during rain
+    trashPts:         10,     // pts for clicking a trash piece
+    dropletPts:       5,      // pts for clicking a bad rain droplet
   },
   normal: {
     selfHeal:         1,
@@ -73,7 +76,10 @@ const DIFFICULTIES = {
     trashSpawnMin:    6,
     trashSpawnMax:    10,
     badDropletDmg:    1,
+    badDropletRate:   0.6,
     dropletInterval:  550,
+    trashPts:         15,
+    dropletPts:       10,
   },
   hard: {
     selfHeal:         1,
@@ -81,7 +87,10 @@ const DIFFICULTIES = {
     trashSpawnMin:    4,
     trashSpawnMax:    6,
     badDropletDmg:    3,
+    badDropletRate:   0.45,
     dropletInterval:  380,
+    trashPts:         20,
+    dropletPts:       15,
   },
 };
 
@@ -218,11 +227,18 @@ function showRainAlert() {
   setTimeout(() => alert.classList.remove('visible'), 4500);
 }
 
-// ── Trash Alert ───────────────────────────────────────────
+// ── Trash Alert (one-time banner at shift start) ──────────
 function showTrashAlert() {
   const alert = document.getElementById('trash-alert');
   alert.classList.add('visible');
   setTimeout(() => alert.classList.remove('visible'), 3500);
+}
+
+// ── Trash Indicator (corner icon for mid-game spawns) ─────
+function showTrashIndicator() {
+  const indicator = document.getElementById('trash-indicator');
+  indicator.classList.add('visible');
+  setTimeout(() => indicator.classList.remove('visible'), 2500);
 }
 
 // ── Droplet Spawning ──────────────────────────────────────
@@ -230,7 +246,7 @@ function spawnDroplet() {
   if (!rainActive || !gameActive) return;
 
   const airZone = document.getElementById('air-zone');
-  const isBad   = Math.random() < 0.6;  // 60% bad, 40% good
+  const isBad   = Math.random() < difficulty.badDropletRate;
 
   const droplet = document.createElement('img');
   droplet.src       = isBad ? 'img/droplet-bad.png' : 'img/droplet_normal.png';
@@ -248,7 +264,7 @@ function spawnDroplet() {
     if (!gameActive || !droplet.parentNode) return;
     droplet.remove();
     if (isBad) {
-      addScore(5); // correctly intercepted a dirty droplet
+      addScore(difficulty.dropletPts); // correctly intercepted a dirty droplet
     }
     // clicking a clean droplet has no effect
   });
@@ -258,6 +274,8 @@ function spawnDroplet() {
     if (!droplet.parentNode) return;
     if (isBad) {
       adjustCleanliness(-difficulty.badDropletDmg);
+    } else {
+      adjustCleanliness(1); // clean droplet reaching the pool helps cleanliness
     }
     droplet.remove();
   });
@@ -316,7 +334,7 @@ function spawnOneTrash() {
   img.style.left = (8  + Math.random() * 72) + '%';
   img.style.top  = (15 + Math.random() * 55) + '%';
   pool.appendChild(img);
-  showTrashAlert();
+  showTrashIndicator();
 }
 
 function scheduleNextTrash() {
@@ -387,7 +405,7 @@ document.getElementById('pool-zone').addEventListener('click', (e) => {
     e.target.remove();
     trashCollected++;
     document.getElementById('trash-collected').textContent = trashCollected;
-    addScore(10);
+    addScore(difficulty.trashPts);
   }
 });
 
@@ -414,6 +432,7 @@ function startGame() {
   renderJerryCans(cleanliness);
   updateOttoState(cleanliness);
   spawnTrash();
+  showTrashAlert();
   showScreen('game-screen');
   startTimer();
   scheduleRain();
@@ -446,7 +465,7 @@ function endGame() {
   else if (trashCollected >= 25)  trashBonus = 150;
   else if (trashCollected >= 10)  trashBonus = 50;
 
-  const sessionTotal = qualityPts + trashBonus;
+  const sessionTotal = gameScore + qualityPts + trashBonus;
 
   // Cleanliness tier label
   const cleanlinessLabel =
@@ -467,6 +486,7 @@ function endGame() {
   document.getElementById('score-trash').textContent         = trashCollected + ' pieces';
   document.getElementById('score-quality-pts').textContent   = qualityPts + ' pts';
   document.getElementById('score-trash-bonus').textContent   = '+' + trashBonus + ' pts';
+  document.getElementById('score-points-earned').textContent = '+' + gameScore + ' pts';
   document.getElementById('score-session-total').textContent = sessionTotal + ' pts';
   document.getElementById('score-lifetime').textContent      = sessionTotal + ' pts';
 
