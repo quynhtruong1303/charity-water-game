@@ -259,7 +259,7 @@ function spawnDroplet() {
   droplet.style.left              = leftPct + '%';
   droplet.style.animationDuration = fallSecs + 's';
 
-  droplet.addEventListener('click', (e) => {
+  droplet.addEventListener('pointerdown', (e) => {
     e.stopPropagation();
     if (!gameActive || !droplet.parentNode) return;
     droplet.remove();
@@ -399,7 +399,7 @@ function spawnTrash() {
 }
 
 // ── Trash Click ───────────────────────────────────────────
-document.getElementById('pool-zone').addEventListener('click', (e) => {
+document.getElementById('pool-zone').addEventListener('pointerdown', (e) => {
   if (!gameActive) return;
   if (e.target.classList.contains('trash-item')) {
     e.target.remove();
