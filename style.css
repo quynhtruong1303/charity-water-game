@@ -113,6 +113,57 @@ body {
   50%       { transform: translateY(-8px); }
 }
 
+/* ---------- Difficulty Selector ---------- */
+.difficulty-selector {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.difficulty-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: #1A1A1A;
+  opacity: 0.6;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.difficulty-btns {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+
+.diff-btn {
+  flex: 1;
+  background-color: rgba(255, 255, 255, 0.45);
+  color: #1A1A1A;
+  border: 2px solid #1A1A1A;
+  border-radius: 50px;
+  padding: 9px 0;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background-color 0.15s ease, transform 0.1s ease;
+  letter-spacing: 0.3px;
+}
+
+.diff-btn:hover {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.diff-btn.active {
+  background-color: #1A1A1A;
+  color: #ffc907;
+}
+
+.diff-btn:active {
+  transform: scale(0.96);
+}
+
 /* ---------- Start Button ---------- */
 .btn-primary {
   background-color: #1A1A1A;

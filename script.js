@@ -57,6 +57,37 @@ const LOSE_MESSAGES = [
   "Better luck next shift! Otto is counting on you.",
 ];
 
+// ── Difficulty Configs ────────────────────────────────────
+const DIFFICULTIES = {
+  easy: {
+    selfHeal:         1,      // %/sec base self-heal
+    trashDrain:       1,      // %/sec per trash piece
+    trashSpawnMin:    8,      // seconds between spawns (min)
+    trashSpawnMax:    15,     // seconds between spawns (max)
+    badDropletDmg:    0.5,    // % removed when bad droplet hits pool
+    dropletInterval:  700,    // ms between droplet spawns during rain
+  },
+  normal: {
+    selfHeal:         1,
+    trashDrain:       2,
+    trashSpawnMin:    6,
+    trashSpawnMax:    10,
+    badDropletDmg:    1,
+    dropletInterval:  550,
+  },
+  hard: {
+    selfHeal:         1,
+    trashDrain:       5,
+    trashSpawnMin:    4,
+    trashSpawnMax:    6,
+    badDropletDmg:    3,
+    dropletInterval:  380,
+  },
+};
+
+let selectedDifficulty = 'normal';
+let difficulty = DIFFICULTIES.normal;
+
 // ── Game State ────────────────────────────────────────────
 let gameScore      = 0;
 let trashCollected = 0;
@@ -226,7 +257,7 @@ function spawnDroplet() {
   droplet.addEventListener('animationend', () => {
     if (!droplet.parentNode) return;
     if (isBad) {
-      adjustCleanliness(-0.5); // dirty droplet reached the pool
+      adjustCleanliness(-difficulty.badDropletDmg);
     }
     droplet.remove();
   });
@@ -241,7 +272,7 @@ function startRain() {
   setWeather('rainy');
   showRainAlert();
 
-  dropletSpawnInterval = setInterval(spawnDroplet, 700);
+  dropletSpawnInterval = setInterval(spawnDroplet, difficulty.dropletInterval);
 
   // Rain lasts 30 seconds then clears
   rainEndTimeout = setTimeout(stopRain, 30000);
@@ -290,7 +321,8 @@ function spawnOneTrash() {
 
 function scheduleNextTrash() {
   if (!gameActive) return;
-  const delay = (8 + Math.random() * 7) * 1000; // 8–15 s between spawns
+  const { trashSpawnMin, trashSpawnMax } = difficulty;
+  const delay = (trashSpawnMin + Math.random() * (trashSpawnMax - trashSpawnMin)) * 1000;
   trashSpawnTimeout = setTimeout(() => {
     spawnOneTrash();
     scheduleNextTrash();
@@ -303,8 +335,8 @@ function startTrashSystems() {
   trashDrainInterval = setInterval(() => {
     if (!gameActive) return;
     const count = document.querySelectorAll('#pool-zone .trash-item').length;
-    // +1%/sec self-heal, -1%/sec per trash piece present
-    adjustCleanliness(1 - count);
+    // self-heal minus drain per trash piece present
+    adjustCleanliness(difficulty.selfHeal - count * difficulty.trashDrain);
   }, 1000);
 }
 
@@ -361,6 +393,9 @@ document.getElementById('pool-zone').addEventListener('click', (e) => {
 
 // ── Game Start ────────────────────────────────────────────
 function startGame() {
+  // Apply selected difficulty
+  difficulty = DIFFICULTIES[selectedDifficulty];
+
   // Reset state
   gameScore      = 0;
   trashCollected = 0;
@@ -437,6 +472,15 @@ function endGame() {
 
   showScreen('score-screen');
 }
+
+// ── Difficulty Selector ───────────────────────────────────
+document.querySelectorAll('.diff-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    selectedDifficulty = btn.dataset.diff;
+    document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  });
+});
 
 // ── Button Listeners ──────────────────────────────────────
 document.getElementById('start-btn').addEventListener('click', startGame);
