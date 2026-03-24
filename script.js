@@ -123,6 +123,131 @@ const TRASH_ITEMS = [
   { src: 'img/can.png',    left: '72%', top: '28%' },
 ];
 
+// ── Audio System ──────────────────────────────────────────
+let audioCtx         = null;
+let ottoSoundTimeout = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    const AudioCtx = window.AudioContext || /** @type {any} */ (window).webkitAudioContext;
+    audioCtx = new AudioCtx();
+  }
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+  return audioCtx;
+}
+
+// Plays a simple oscillator tone with an attack/decay envelope
+function playTone(freq, type, duration, gainPeak, endFreq = null) {
+  const ctx  = getAudioCtx();
+  const osc  = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, ctx.currentTime);
+  if (endFreq !== null) {
+    osc.frequency.exponentialRampToValueAtTime(endFreq, ctx.currentTime + duration);
+  }
+  gain.gain.setValueAtTime(0, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(gainPeak, ctx.currentTime + 0.01);
+  gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+  osc.start(ctx.currentTime);
+  osc.stop(ctx.currentTime + duration + 0.05);
+}
+
+// Bad droplet intercepted — satisfying water pop
+function soundDropletIntercept() {
+  playTone(600, 'sine', 0.15, 0.25, 1100);
+  setTimeout(() => playTone(350, 'sine', 0.1, 0.12, 150), 60);
+}
+
+// Bad droplet hits pool — murky splosh
+function soundDropletHitPool() {
+  playTone(280, 'sine', 0.3, 0.2, 70);
+}
+
+// Clean droplet lands — gentle chime plink
+function soundCleanDropletLand() {
+  playTone(1400, 'sine', 0.25, 0.1, 900);
+}
+
+// ── Preloaded Audio Files ─────────────────────────────────
+const trashAudio     = new Audio('sfx/trash.wav');
+const bgmAudio       = new Audio('sfx/game-music-bgm.mp3');
+const gameStartAudio = new Audio('sfx/game-start.mp3');
+const gameOverAudio  = new Audio('sfx/game-over.mp3');
+const winSoundAudio  = new Audio('sfx/win-sound.mp3');
+const clickAudio     = new Audio('sfx/click-button.mp3');
+
+bgmAudio.loop   = true;
+bgmAudio.volume = 0.35;
+
+function soundTrashRemove() {
+  trashAudio.currentTime = 0;
+  trashAudio.play().catch(() => {});
+}
+
+function soundClick() {
+  clickAudio.currentTime = 0;
+  clickAudio.play().catch(() => {});
+}
+
+function startBGM() {
+  if (bgmAudio.paused) bgmAudio.play().catch(() => {});
+}
+
+function stopBGM() {
+  bgmAudio.pause();
+  bgmAudio.currentTime = 0;
+}
+
+// Ambient rain — loaded from sfx/rain.mp3, looped for the full 30s rain window
+const rainAudio  = new Audio('sfx/rain.mp3');
+rainAudio.loop   = true;
+rainAudio.volume = 0.5;
+
+function startRainSound() {
+  rainAudio.currentTime = 0;
+  rainAudio.play().catch(() => {});
+}
+
+function stopRainSound() {
+  rainAudio.pause();
+  rainAudio.currentTime = 0;
+}
+
+// Otto random chirps — cute high-pitched squeaks
+function playOttoSound() {
+  if (!gameActive) return;
+  const patterns = [
+    () => {
+      playTone(820, 'sine', 0.1, 0.1, 1050);
+      setTimeout(() => playTone(620, 'sine', 0.08, 0.07, 420), 130);
+    },
+    () => {
+      playTone(950, 'sine', 0.08, 0.09, 750);
+      setTimeout(() => playTone(1050, 'sine', 0.07, 0.09, 850), 110);
+      setTimeout(() => playTone(720,  'sine', 0.1,  0.07, 500), 230);
+    },
+    () => {
+      playTone(700, 'sine', 0.12, 0.1, 900);
+    },
+  ];
+  patterns[Math.floor(Math.random() * patterns.length)]();
+  scheduleOttoSound();
+}
+
+function scheduleOttoSound() {
+  if (!gameActive) return;
+  const delay = (10 + Math.random() * 15) * 1000; // 10–25 s
+  ottoSoundTimeout = setTimeout(playOttoSound, delay);
+}
+
+function clearOttoSound() {
+  clearTimeout(ottoSoundTimeout);
+  ottoSoundTimeout = null;
+}
+
 // ── Screen Navigation ─────────────────────────────────────
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -264,7 +389,8 @@ function spawnDroplet() {
     if (!gameActive || !droplet.parentNode) return;
     droplet.remove();
     if (isBad) {
-      addScore(difficulty.dropletPts); // correctly intercepted a dirty droplet
+      addScore(difficulty.dropletPts);
+      soundDropletIntercept();
     }
     // clicking a clean droplet has no effect
   });
@@ -274,8 +400,10 @@ function spawnDroplet() {
     if (!droplet.parentNode) return;
     if (isBad) {
       adjustCleanliness(-difficulty.badDropletDmg);
+      soundDropletHitPool();
     } else {
-      adjustCleanliness(1); // clean droplet reaching the pool helps cleanliness
+      adjustCleanliness(1);
+      soundCleanDropletLand();
     }
     droplet.remove();
   });
@@ -291,6 +419,7 @@ function startRain() {
   showRainAlert();
 
   dropletSpawnInterval = setInterval(spawnDroplet, difficulty.dropletInterval);
+  startRainSound();
 
   // Rain lasts 30 seconds then clears
   rainEndTimeout = setTimeout(stopRain, 30000);
@@ -305,6 +434,7 @@ function stopRain() {
 
   // Remove any droplets still in flight
   document.querySelectorAll('.rain-droplet').forEach(d => d.remove());
+  stopRainSound();
   setWeather('sunny');
 }
 
@@ -405,11 +535,19 @@ document.getElementById('pool-zone').addEventListener('pointerdown', (e) => {
     trashCollected++;
     document.getElementById('trash-collected').textContent = trashCollected;
     addScore(difficulty.trashPts);
+    soundTrashRemove();
   }
 });
 
 // ── Game Start ────────────────────────────────────────────
 function startGame() {
+  // Unlock AudioContext on first user gesture (required by browsers)
+  getAudioCtx();
+
+  gameStartAudio.currentTime = 0;
+  gameStartAudio.play().catch(() => {});
+  startBGM();
+
   // Apply selected difficulty
   difficulty = DIFFICULTIES[selectedDifficulty];
 
@@ -431,6 +569,7 @@ function startGame() {
   updateOttoState(cleanliness);
   spawnTrash();
   showTrashAlert();
+  scheduleOttoSound();
   showScreen('game-screen');
   startTimer();
   scheduleRain();
@@ -442,9 +581,20 @@ function endGame() {
   stopTimer();
   clearRain();
   clearTrashSystems();
+  clearOttoSound();
+  stopBGM();
   gameActive = false;
 
   const win = cleanliness >= 80;
+
+  // cleanliness >= 50 = win sound, below = game over sound
+  if (cleanliness >= 50) {
+    winSoundAudio.currentTime = 0;
+    winSoundAudio.play().catch(() => {});
+  } else {
+    gameOverAudio.currentTime = 0;
+    gameOverAudio.play().catch(() => {});
+  }
 
   // Random message from appropriate array
   const pool = win ? WIN_MESSAGES : LOSE_MESSAGES;
@@ -497,12 +647,23 @@ document.querySelectorAll('.diff-btn').forEach(btn => {
     selectedDifficulty = btn.dataset.diff;
     document.querySelectorAll('.diff-btn').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    soundClick();
+    startBGM(); // first interaction — kick off BGM on start screen
   });
 });
 
 // ── Button Listeners ──────────────────────────────────────
 document.getElementById('start-btn').addEventListener('click', startGame);
-document.getElementById('replay-btn').addEventListener('click', () => showScreen('start-screen'));
+document.getElementById('replay-btn').addEventListener('click', () => {
+  soundClick();
+  startBGM();
+  showScreen('start-screen');
+});
+
+// Brand logo links — click sound on both screens
+document.querySelectorAll('.cw-logo-wrap').forEach(link => {
+  link.addEventListener('click', soundClick);
+});
 
 // ── Initial render (game screen preview) ─────────────────
 renderJerryCans(80);
