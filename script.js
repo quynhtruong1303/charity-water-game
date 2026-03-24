@@ -64,6 +64,17 @@ let cleanliness    = 80;   // 0–100
 let timerSeconds   = 60;
 let timerInterval  = null;
 let gameActive     = false;
+let currentTier    = null; // tracks last Otto tier to avoid speech-bubble flicker
+
+// ── Rain State ────────────────────────────────────────────
+let rainActive           = false;
+let rainScheduleTimeout  = null;
+let rainEndTimeout       = null;
+let dropletSpawnInterval = null;
+
+// ── Trash State ───────────────────────────────────────────
+let trashDrainInterval = null;
+let trashSpawnTimeout  = null;
 
 // Static trash items to re-spawn on each new game
 const TRASH_ITEMS = [
@@ -125,17 +136,183 @@ const OTTO_SPRITES = {
 };
 
 function updateOttoState(pct) {
-  const tier     = getTier(pct);
-  const messages = OTTO_MESSAGES[tier];
-  const msg      = messages[Math.floor(Math.random() * messages.length)];
+  const tier = getTier(pct);
+
+  // Only swap speech bubble when crossing into a new health tier
+  if (tier !== currentTier) {
+    const messages = OTTO_MESSAGES[tier];
+    const msg = messages[Math.floor(Math.random() * messages.length)];
+    document.getElementById('speech-bubble').textContent = msg;
+    currentTier = tier;
+  }
 
   document.getElementById('otto-sprite').src = OTTO_SPRITES[tier];
-  document.getElementById('speech-bubble').textContent = msg;
   document.getElementById('pool-zone').style.background = POOL_COLORS[tier];
 
-  // Warning banner: visible only in the sick tier
   const pool = document.getElementById('pool-zone');
   pool.classList.toggle('warning-flash', tier === 'sick');
+}
+
+// ── Cleanliness Adjustment ────────────────────────────────
+function adjustCleanliness(delta) {
+  cleanliness = Math.max(0, Math.min(100, cleanliness + delta));
+  renderJerryCans(cleanliness);
+  updateOttoState(cleanliness);
+}
+
+// ── Weather UI ────────────────────────────────────────────
+function setWeather(state) {
+  const icon     = document.getElementById('weather-icon');
+  const label    = document.getElementById('weather-label');
+  const airZone  = document.getElementById('air-zone');
+  const poolZone = document.getElementById('pool-zone');
+
+  if (state === 'rainy') {
+    icon.textContent  = '🌧️';
+    label.textContent = 'Raining';
+    airZone.classList.add('raining');
+    poolZone.classList.add('raining');
+  } else {
+    icon.textContent  = '☀️';
+    label.textContent = 'Sunny';
+    airZone.classList.remove('raining');
+    poolZone.classList.remove('raining');
+  }
+}
+
+// ── Rain Alert ────────────────────────────────────────────
+function showRainAlert() {
+  const alert = document.getElementById('rain-alert');
+  alert.classList.add('visible');
+  setTimeout(() => alert.classList.remove('visible'), 4500);
+}
+
+// ── Trash Alert ───────────────────────────────────────────
+function showTrashAlert() {
+  const alert = document.getElementById('trash-alert');
+  alert.classList.add('visible');
+  setTimeout(() => alert.classList.remove('visible'), 3500);
+}
+
+// ── Droplet Spawning ──────────────────────────────────────
+function spawnDroplet() {
+  if (!rainActive || !gameActive) return;
+
+  const airZone = document.getElementById('air-zone');
+  const isBad   = Math.random() < 0.6;  // 60% bad, 40% good
+
+  const droplet = document.createElement('img');
+  droplet.src       = isBad ? 'img/droplet-bad.png' : 'img/droplet_normal.png';
+  droplet.className = 'rain-droplet ' + (isBad ? 'bad' : 'good');
+  droplet.alt       = isBad ? 'dirty droplet' : 'clean droplet';
+
+  // Random horizontal position and fall speed
+  const leftPct    = 4 + Math.random() * 84;
+  const fallSecs   = 3.5 + Math.random() * 2.0;   // 3.5 – 5.5 s
+  droplet.style.left              = leftPct + '%';
+  droplet.style.animationDuration = fallSecs + 's';
+
+  droplet.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (!gameActive || !droplet.parentNode) return;
+    droplet.remove();
+    if (isBad) {
+      addScore(5); // correctly intercepted a dirty droplet
+    }
+    // clicking a clean droplet has no effect
+  });
+
+  // When droplet finishes falling into the pool
+  droplet.addEventListener('animationend', () => {
+    if (!droplet.parentNode) return;
+    if (isBad) {
+      adjustCleanliness(-0.5); // dirty droplet reached the pool
+    }
+    droplet.remove();
+  });
+
+  airZone.appendChild(droplet);
+}
+
+// ── Rain Cycle ────────────────────────────────────────────
+function startRain() {
+  if (!gameActive) return;
+  rainActive = true;
+  setWeather('rainy');
+  showRainAlert();
+
+  dropletSpawnInterval = setInterval(spawnDroplet, 700);
+
+  // Rain lasts 30 seconds then clears
+  rainEndTimeout = setTimeout(stopRain, 30000);
+}
+
+function stopRain() {
+  rainActive = false;
+  clearInterval(dropletSpawnInterval);
+  dropletSpawnInterval = null;
+  clearTimeout(rainEndTimeout);
+  rainEndTimeout = null;
+
+  // Remove any droplets still in flight
+  document.querySelectorAll('.rain-droplet').forEach(d => d.remove());
+  setWeather('sunny');
+}
+
+function scheduleRain() {
+  // Start rain at a random point so the full 30 s fits inside the 60 s shift.
+  // Start window: 5 s – 25 s into the shift.
+  const delay = (5 + Math.random() * 20) * 1000;
+  rainScheduleTimeout = setTimeout(startRain, delay);
+}
+
+function clearRain() {
+  clearTimeout(rainScheduleTimeout);
+  rainScheduleTimeout = null;
+  stopRain();
+}
+
+// ── Trash System ──────────────────────────────────────────
+const TRASH_SRCS = ['img/bag.png', 'img/bottle.png', 'img/can.png'];
+
+function spawnOneTrash() {
+  if (!gameActive) return;
+  const pool = document.getElementById('pool-zone');
+  const img  = document.createElement('img');
+  img.src       = TRASH_SRCS[Math.floor(Math.random() * TRASH_SRCS.length)];
+  img.alt       = 'trash';
+  img.className = 'trash-item';
+  img.style.left = (8  + Math.random() * 72) + '%';
+  img.style.top  = (15 + Math.random() * 55) + '%';
+  pool.appendChild(img);
+  showTrashAlert();
+}
+
+function scheduleNextTrash() {
+  if (!gameActive) return;
+  const delay = (8 + Math.random() * 7) * 1000; // 8–15 s between spawns
+  trashSpawnTimeout = setTimeout(() => {
+    spawnOneTrash();
+    scheduleNextTrash();
+  }, delay);
+}
+
+function startTrashSystems() {
+  scheduleNextTrash();
+  // Drain -1% cleanliness per second for every trash piece in the pool
+  trashDrainInterval = setInterval(() => {
+    if (!gameActive) return;
+    const count = document.querySelectorAll('#pool-zone .trash-item').length;
+    // +1%/sec self-heal, -1%/sec per trash piece present
+    adjustCleanliness(1 - count);
+  }, 1000);
+}
+
+function clearTrashSystems() {
+  clearTimeout(trashSpawnTimeout);
+  trashSpawnTimeout = null;
+  clearInterval(trashDrainInterval);
+  trashDrainInterval = null;
 }
 
 // ── Jerry Can Bar ─────────────────────────────────────────
@@ -152,7 +329,7 @@ function renderJerryCans(pct) {
     row.appendChild(img);
   }
 
-  document.getElementById('cleanliness-pct').textContent = pct + '%';
+  document.getElementById('cleanliness-pct').textContent = Math.round(pct) + '%';
 }
 
 // ── Trash Spawning ────────────────────────────────────────
@@ -188,7 +365,11 @@ function startGame() {
   gameScore      = 0;
   trashCollected = 0;
   cleanliness    = 80;
+  currentTier    = null;
   gameActive     = true;
+  clearRain();
+  clearTrashSystems();
+  setWeather('sunny');
 
   // Reset UI counters
   document.getElementById('game-score').textContent    = '0';
@@ -200,11 +381,15 @@ function startGame() {
   spawnTrash();
   showScreen('game-screen');
   startTimer();
+  scheduleRain();
+  startTrashSystems();
 }
 
 // ── Game End ──────────────────────────────────────────────
 function endGame() {
   stopTimer();
+  clearRain();
+  clearTrashSystems();
   gameActive = false;
 
   const win = cleanliness >= 80;

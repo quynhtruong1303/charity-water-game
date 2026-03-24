@@ -38,8 +38,8 @@
           <span class="timer-value" id="game-timer">01:00</span>
         </div>
         <div class="weather-box">
-          <span class="weather-icon">☀️</span>
-          <span class="top-label">Sunny</span>
+          <span class="weather-icon" id="weather-icon">☀️</span>
+          <span class="top-label" id="weather-label">Sunny</span>
         </div>
         <div class="score-box">
           <span class="top-label">Score</span>
@@ -69,7 +69,16 @@
         </div>
 
         <!-- Right play area -->
-        <div class="game-play-area">
+        <div class="game-play-area" id="game-play-area">
+          <!-- Rain alert banner -->
+          <div class="rain-alert" id="rain-alert">
+            🌧️ It's raining! Click the <strong>dirty brown droplets</strong> before they reach Otto's pool!
+          </div>
+
+          <!-- Trash alert banner -->
+          <div class="trash-alert" id="trash-alert">
+            🗑️ Trash in the pool! Click it to remove it!
+          </div>
 
           <!-- Upper air zone (rain droplets fall here) -->
           <div class="air-zone" id="air-zone">

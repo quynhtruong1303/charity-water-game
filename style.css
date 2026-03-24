@@ -331,6 +331,59 @@ body {
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;   /* anchor for rain-alert */
+}
+
+/* ---------- Rain Alert Banner ---------- */
+.rain-alert {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%) translateY(calc(-100% - 20px));
+  opacity: 0;
+  background-color: #003366;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 24px;
+  white-space: nowrap;
+  z-index: 30;
+  pointer-events: none;
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+
+.rain-alert.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
+}
+
+/* ---------- Trash Alert Banner ---------- */
+.trash-alert {
+  position: absolute;
+  top: 54px;
+  left: 50%;
+  transform: translateX(-50%) translateY(calc(-100% - 20px));
+  opacity: 0;
+  background-color: #BF6C46;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 10px 18px;
+  border-radius: 24px;
+  white-space: nowrap;
+  z-index: 30;
+  pointer-events: none;
+  text-align: center;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+
+.trash-alert.visible {
+  transform: translateX(-50%) translateY(0);
+  opacity: 1;
 }
 
 /* Air zone — where rain droplets fall */
@@ -341,6 +394,34 @@ body {
   background-color: #fff7e1;   /* sunny = same yellow; JS swaps for rain */
   box-shadow: 0 4px 0 0 #fff7e1; /* extend cream over pool-zone top to kill hairline */
   z-index: 2;
+  transition: background-color 1s ease;
+}
+
+.air-zone.raining {
+  background-color: #c8d8e8;
+  box-shadow: 0 4px 0 0 #c8d8e8;
+}
+
+/* ---------- Rain Droplets ---------- */
+.rain-droplet {
+  position: absolute;
+  top: -68px;
+  width: 68px;
+  height: 68px;
+  object-fit: contain;
+  cursor: pointer;
+  z-index: 15;
+  animation: dropletFall linear forwards;
+  transition: transform 0.1s;
+}
+
+.rain-droplet:hover {
+  transform: scale(1.15);
+}
+
+@keyframes dropletFall {
+  from { top: -52px; }
+  to   { top: 110%; }
 }
 
 /* Pool zone — the water */
@@ -369,6 +450,11 @@ body {
   animation: waveDrift 5s linear infinite;
   z-index: 1;
   pointer-events: none;
+}
+
+/* Swap wave colour to match the rainy sky */
+.pool-zone.raining::after {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 26'%3E%3Cpath d='M0,0 L400,0 L400,15 C360,6 320,22 280,15 C240,6 200,24 160,15 C120,6 80,23 40,15 C20,9 10,18 0,15 Z' fill='%23c8d8e8'/%3E%3C/svg%3E");
 }
 
 @keyframes waveDrift {
