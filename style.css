@@ -348,6 +348,11 @@ body {
   object-fit: cover;
 }
 
+/* Wrapper keeps otto + stats together for mobile reflow */
+.otto-stats-wrap {
+  display: contents; /* transparent in desktop flow — children behave as direct panel children */
+}
+
 /* Stats group wrapper */
 .stats-group {
   display: flex;
@@ -427,7 +432,9 @@ body {
   font-weight: 700;
   padding: 10px 18px;
   border-radius: 24px;
-  white-space: nowrap;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  white-space: normal;
   z-index: 30;
   pointer-events: none;
   text-align: center;
@@ -453,7 +460,9 @@ body {
   font-weight: 700;
   padding: 10px 18px;
   border-radius: 24px;
-  white-space: nowrap;
+  width: max-content;
+  max-width: calc(100% - 24px);
+  white-space: normal;
   z-index: 30;
   pointer-events: none;
   text-align: center;
@@ -828,15 +837,43 @@ body {
     flex-shrink: 0;
   }
 
-  /* Reorder inside the panel: sprite → bubble → stats */
-  .otto-game-sprite {
+  /* Left column: Otto sprite + trash count stacked */
+  .otto-stats-wrap {
     order: 1;
-    width: 60px;
-    height: 60px;
-    margin-top: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
     flex-shrink: 0;
   }
 
+  .otto-game-sprite {
+    width: 60px;
+    height: 60px;
+    margin-top: 0;
+  }
+
+  .stats-group {
+    width: auto;
+    gap: 0;
+  }
+
+  .stat-row {
+    justify-content: center;
+    gap: 6px;
+    padding: 0;
+  }
+
+  .stat-icon {
+    width: 40px;
+    height: 40px;
+  }
+
+  .stat-count {
+    font-size: 14px;
+  }
+
+  /* Speech bubble in the middle */
   .speech-bubble {
     order: 2;
     flex: 1;
@@ -854,26 +891,21 @@ body {
     border-right-color: #fff;
   }
 
-  .stats-group {
+  /* Instructions on the right */
+  .game-instructions {
     order: 3;
-    width: auto;
-    flex-shrink: 0;
-    gap: 4px;
+    flex: 1;
+    border-top: none;
+    border-left: 1.5px solid rgba(26, 26, 26, 0.15);
+    padding: 6px 10px;
   }
 
-  .stat-row {
-    justify-content: center;
-    gap: 6px;
-    padding: 0;
+  .instructions-title {
+    font-size: 11px;
   }
 
-  .stat-icon {
-    width: 32px;
-    height: 32px;
-  }
-
-  .stat-count {
-    font-size: 14px;
+  .game-instructions p {
+    font-size: 10px;
   }
 
   /* Scale down pool objects */
