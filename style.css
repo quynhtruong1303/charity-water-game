@@ -377,6 +377,35 @@ body {
   color: #1A1A1A;
 }
 
+/* ---------- Game Instructions ---------- */
+.game-instructions {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: 10px 6px 4px;
+  border-top: 1.5px solid rgba(26, 26, 26, 0.15);
+  width: 100%;
+}
+
+.instructions-title {
+  font-size: 14px;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #1A1A1A;
+  opacity: 0.8;
+  margin-bottom: 4px;
+}
+
+.game-instructions p {
+  font-size: 12px;
+  font-weight: 600;
+  color: #1A1A1A;
+  opacity: 0.75;
+  line-height: 1.4;
+  text-align: left;
+}
+
 /* ---------- Play Area ---------- */
 .game-play-area {
   flex: 1;
