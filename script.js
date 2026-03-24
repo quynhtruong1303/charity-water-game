@@ -353,7 +353,6 @@ function startTrashSystems() {
   trashDrainInterval = setInterval(() => {
     if (!gameActive) return;
     const count = document.querySelectorAll('#pool-zone .trash-item').length;
-    // self-heal minus drain per trash piece present
     adjustCleanliness(difficulty.selfHeal - count * difficulty.trashDrain);
   }, 1000);
 }
@@ -425,9 +424,8 @@ function startGame() {
   setWeather('sunny');
 
   // Reset UI counters
-  document.getElementById('game-score').textContent    = '0';
+  document.getElementById('game-score').textContent      = '0';
   document.getElementById('trash-collected').textContent = '0';
-  document.getElementById('medicine-count').textContent  = '0';
 
   renderJerryCans(cleanliness);
   updateOttoState(cleanliness);

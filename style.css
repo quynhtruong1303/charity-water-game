@@ -589,18 +589,6 @@ body {
   50%       { opacity: 0.35; }
 }
 
-.pool-label {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255,255,255,0.5);
-  pointer-events: none;
-  white-space: nowrap;
-}
-
 /* Sea vegetation at pool bottom */
 .pool-veg {
   position: absolute;
